@@ -17,7 +17,20 @@ colors like a night light or blue light filter, or tint the screen amber, red or
 Looking for an open-source alternative to PangoBright, CareUEyes, Iris or f.lux? dimmest covers
 the dimming and warm-color part, with nothing else attached.
 
-> **Status:** v0.1.0, first working build. No release download yet; build it yourself (see below).
+## Download
+
+Get `dimmest.exe` from the [latest release](https://github.com/viniciussoares/dimmest/releases/latest).
+There's no installer: put it anywhere and run it.
+
+The exe isn't code-signed, so Windows may say "Windows protected your PC". Click **More info**,
+then **Run anyway**. Every release is built by GitHub Actions straight from this code, with a
+SHA-256 hash and a build attestation you can check:
+
+```
+gh attestation verify dimmest.exe --repo viniciussoares/dimmest
+```
+
+Or build it yourself, see [Building](#building).
 
 ## How to use
 
@@ -69,6 +82,7 @@ like Windows Night light or f.lux, and you can combine them with dimming.
 
 It's free and open source under the BSD license, so you can read every line of the code.
 It doesn't need administrator rights, doesn't install anything and doesn't connect to the internet.
+Release builds are made by GitHub Actions from this code, and you can verify that (see [Download](#download)).
 
 ### Does it dim each monitor separately?
 

@@ -1,0 +1,90 @@
+# Builds dimmest.exe on GitHub (not on anyone's PC), publishes its SHA-256 and a signed
+# build attestation, and creates the release. Runs when a tag like v0.1.0 is pushed.
+# Can also be run by hand from the Actions tab to test the build; that skips the release.
+
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write      # create the release
+  id-token: write      # sign the attestation
+  attestations: write  # store the attestation
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check tag matches version.h
+        if: github.ref_type == 'tag'
+        shell: pwsh
+        run: |
+          $version = (Select-String -Path src/version.h -Pattern '#define DIMMEST_VERSION "(.+)"').Matches[0].Groups[1].Value
+          if ("v$version" -ne $env:GITHUB_REF_NAME) {
+            throw "tag $env:GITHUB_REF_NAME doesn't match src/version.h ($version)"
+          }
+
+      - name: Build
+        run: |
+          cmake -S . -B build -A x64
+          cmake --build build --config Release
+
+      - name: Hash
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash build/Release/dimmest.exe -Algorithm SHA256).Hash.ToLower()
+          Set-Content -Path build/Release/dimmest.exe.sha256 -Value "$hash  dimmest.exe" -Encoding ascii
+          Write-Output "SHA-256: $hash"
+
+          $notes = @'
+          ## Download
+
+          `dimmest.exe` is the whole app: no installer, put it anywhere and run it.
+
+          The exe isn't code-signed, so Windows may say "Windows protected your PC".
+          Click **More info**, then **Run anyway**.
+
+          ## Verify
+
+          Built by GitHub Actions from commit {{COMMIT}}.
+
+          SHA-256: `{{HASH}}`
+
+          Check it in PowerShell with `(Get-FileHash dimmest.exe).Hash`, or check the build attestation
+          (proof that this exe was built from this repo) with the GitHub CLI:
+
+          ```
+          gh attestation verify dimmest.exe --repo {{REPO}}
+          ```
+          '@
+          $notes.Replace('{{HASH}}', $hash).Replace('{{COMMIT}}', $env:GITHUB_SHA).Replace('{{REPO}}', $env:GITHUB_REPOSITORY) |
+            Set-Content -Path build/notes.md -Encoding utf8
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: build/Release/dimmest.exe
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: dimmest
+          path: |
+            build/Release/dimmest.exe
+            build/Release/dimmest.exe.sha256
+
+      - name: Publish release
+        if: github.ref_type == 'tag'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create $env:GITHUB_REF_NAME `
+            build/Release/dimmest.exe build/Release/dimmest.exe.sha256 `
+            --title "dimmest $env:GITHUB_REF_NAME" `
+            --notes-file build/notes.md
