@@ -1,0 +1,20 @@
+# build output
+build/
+out/
+bin/
+obj/
+x64/
+Debug/
+Release/
+*.exe
+*.obj
+*.pdb
+*.ilk
+*.lib
+*.exp
+
+# IDE
+.vs/
+*.user
+*.suo
+.vscode/
