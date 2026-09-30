@@ -1,8 +1,6 @@
 # build output
 build/
 out/
-bin/
-obj/
 x64/
 Debug/
 Release/
@@ -12,9 +10,25 @@ Release/
 *.ilk
 *.lib
 *.exp
+*.res
+*.aps
+
+# cmake, if someone builds in-source
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CMakeUserPresets.json
+*.sln
+*.vcxproj
+*.vcxproj.filters
 
 # IDE
 .vs/
+.vscode/
+.idea/
 *.user
 *.suo
-.vscode/
+
+# Windows
+Thumbs.db
+desktop.ini

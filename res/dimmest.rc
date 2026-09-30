@@ -1,0 +1,35 @@
+// SPDX-License-Identifier: BSD-3-Clause
+
+#include <windows.h>
+#include "resource.h"
+#include "version.h"
+
+IDI_APP_ICON ICON "dimmest.ico"
+IDI_TRAY_WHITE ICON "tray-white.ico"
+IDI_TRAY_BLACK ICON "tray-black.ico"
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION DIMMEST_VERSION_MAJOR,DIMMEST_VERSION_MINOR,DIMMEST_VERSION_PATCH,0
+ PRODUCTVERSION DIMMEST_VERSION_MAJOR,DIMMEST_VERSION_MINOR,DIMMEST_VERSION_PATCH,0
+ FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
+ FILEOS VOS_NT_WINDOWS32
+ FILETYPE VFT_APP
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "FileDescription", "dimmest screen dimmer"
+            VALUE "FileVersion", DIMMEST_VERSION
+            VALUE "InternalName", "dimmest"
+            VALUE "LegalCopyright", "BSD-3-Clause"
+            VALUE "OriginalFilename", "dimmest.exe"
+            VALUE "ProductName", "dimmest"
+            VALUE "ProductVersion", DIMMEST_VERSION
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
